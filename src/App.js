@@ -10,36 +10,52 @@ import { AuthContext } from "./shared/context/auth-context";
 
 const App = () => {
   const [isLoggedIn, setIsLoggdeIn] = useState(false);
+
   const login = useCallback(() => {
     setIsLoggdeIn(true);
   }, []);
-  const logut = useCallback(() => {
+  const logout = useCallback(() => {
     setIsLoggdeIn(false);
   }, []);
+
+  let routes;
+  if (isLoggedIn) {
+    routes = (
+      <Switch>
+        <Route path='/:userId/places' exact>
+          <UserPlaces />
+        </Route>
+        <Route path='/places/new'>
+          <NewPlace />
+        </Route>
+        <Route path='/places/:placeId'>
+          <UpdatePlace />
+        </Route>
+        <Redirect to='/' />
+      </Switch>
+    );
+  } else {
+    routes = (
+      <Switch>
+        <Route path='/' exact>
+          <Users />
+        </Route>
+        <Route path='/:userId/places' exact>
+          <UserPlaces />
+        </Route>
+        <Route path='/auth'>
+          <Auth />
+        </Route>
+        <Redirect to='/auth' />
+      </Switch>
+    );
+  }
+
   return (
     <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
       <BrowserRouter>
         <MainNavigation />
-        <main>
-          <Switch>
-            <Route path='/' exact>
-              <Users />
-            </Route>
-            <Route path='/:userId/places' exact>
-              <UserPlaces />
-            </Route>
-            <Route path='/places/new'>
-              <NewPlace />
-            </Route>
-            <Route path='/places/:placeId'>
-              <UpdatePlace />
-            </Route>
-            <Route path='/auth'>
-              <Auth />
-            </Route>
-            <Redirect to='/' />
-          </Switch>
-        </main>
+        <main>{routes}</main>
       </BrowserRouter>
     </AuthContext.Provider>
   );
